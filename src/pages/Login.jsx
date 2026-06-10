@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { api, isLoggedIn } from '../lib/api'
+import { api, setToken, isLoggedIn } from '../lib/api'
 import { useStore } from '../store'
 
 export default function Login() {
@@ -16,23 +16,27 @@ export default function Login() {
     if (isLoggedIn()) { navigate('/', { replace: true }); return }
     const token = params.get('token')
     if (!token) return
+
     setLoading(true)
-    const BASE = import.meta.env.VITE_API_URL || 'https://coach-ai-production-98fb.up.railway.app'
-    fetch(`${BASE}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token }),
-    })
-      .then(r => { if (!r.ok) throw new Error('invalid'); return r.json() })
-      .then(async (data) => {
-        if (!data.user_id) throw new Error('no uid')
-        setToken(token)
-        localStorage.setItem('ic_uid', String(data.user_id))
-        try { const me = await api.getMe(); setUser(me); if (me?.onboarding_done) setOnboardingDone() } catch {}
+    // Guardar token inmediatamente y llamar /api/me para verificar
+    // Esto evita el preflight CORS del /auth/login
+    setToken(token)
+    localStorage.setItem('ic_uid', 'pending')
+
+    api.getMe()
+      .then(me => {
+        if (!me || !me.user_id) throw new Error('invalid')
+        setUser(me)
+        if (me.onboarding_done) setOnboardingDone()
         navigate('/', { replace: true })
       })
-      .catch(() => setError('Token inválido o expirado. Usa /login en el bot.'))
-      .finally(() => setLoading(false))
+      .catch(() => {
+        // Token inválido — limpiar
+        localStorage.removeItem('ic_token')
+        localStorage.removeItem('ic_uid')
+        setError('Token inválido o expirado. Usa /login en el bot.')
+        setLoading(false)
+      })
   }, [])
 
   async function handleEmail(e) {
@@ -67,7 +71,7 @@ export default function Login() {
           <div className="text-center card p-8">
             <div className="text-4xl mb-4">📬</div>
             <h2 className="text-xl font-semibold mb-2">Revisa tu correo</h2>
-            <p className="text-[#555] text-sm">Link de acceso enviado a <strong className="text-white">{email}</strong></p>
+            <p className="text-[#555] text-sm">Link enviado a <strong className="text-white">{email}</strong></p>
             <button onClick={() => setSent(false)} className="mt-5 text-sm text-[#444] underline">Usar otro correo</button>
           </div>
         ) : (<>
@@ -88,7 +92,7 @@ export default function Login() {
               {loading ? 'Enviando...' : 'Recibir link →'}
             </button>
           </form>
-          <p className="text-center text-[#333] text-xs mt-6">Sin contraseña. Link de un solo uso, válido 10 minutos.</p>
+          <p className="text-center text-[#333] text-xs mt-6">Sin contraseña. Link de un solo uso.</p>
         </>)}
       </div>
     </div>
