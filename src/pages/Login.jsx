@@ -17,8 +17,17 @@ export default function Login() {
     const token = params.get('token')
     if (!token) return
     setLoading(true)
-    api.loginWithToken(token)
-      .then(async () => {
+    const BASE = import.meta.env.VITE_API_URL || 'https://coach-ai-production-98fb.up.railway.app'
+    fetch(`${BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    })
+      .then(r => { if (!r.ok) throw new Error('invalid'); return r.json() })
+      .then(async (data) => {
+        if (!data.user_id) throw new Error('no uid')
+        setToken(token)
+        localStorage.setItem('ic_uid', String(data.user_id))
         try { const me = await api.getMe(); setUser(me); if (me?.onboarding_done) setOnboardingDone() } catch {}
         navigate('/', { replace: true })
       })
