@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+  body {
+    background: #000;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+    min-height: 100dvh;
+  }
+  ::-webkit-scrollbar { display: none; }
+}
+
+@layer components {
+  .card   { @apply bg-[#111] border border-[#222] rounded-2xl; }
+  .card-sm{ @apply bg-[#111] border border-[#222] rounded-xl; }
+  .surface{ @apply bg-[#1a1a1a] rounded-xl; }
+  .btn-primary   { @apply bg-white text-black rounded-2xl font-semibold text-sm px-5 py-3 active:scale-95 transition-all cursor-pointer disabled:opacity-40; }
+  .btn-secondary { @apply bg-[#1a1a1a] text-white rounded-2xl font-medium text-sm px-5 py-3 active:scale-95 transition-all border border-[#333] cursor-pointer; }
+  .label  { @apply text-[10px] font-medium tracking-widest uppercase text-[#555]; }
+  .input  { @apply w-full bg-[#1a1a1a] border border-[#333] rounded-xl px-4 py-3 text-white placeholder-[#444] text-sm focus:outline-none focus:border-[#555] transition-colors; }
+  .page   { @apply min-h-dvh bg-black pb-28; }
+  .section{ @apply px-4; }
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.fade-up { animation: fadeUp 0.35s cubic-bezier(0.16,1,0.3,1) both; }
+.stagger > *:nth-child(1) { animation-delay:0ms; }
+.stagger > *:nth-child(2) { animation-delay:60ms; }
+.stagger > *:nth-child(3) { animation-delay:120ms; }
+.stagger > *:nth-child(4) { animation-delay:180ms; }
+.stagger > *:nth-child(5) { animation-delay:240ms; }
+.stagger > *:nth-child(6) { animation-delay:300ms; }
