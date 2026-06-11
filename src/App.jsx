@@ -15,6 +15,22 @@ function Guard({ children }) {
   return children
 }
 
+// Bloquea acceso a rutas principales si el onboarding no está completo
+function RequireOnboarding({ children }) {
+  const { onboardingDone } = useStore()
+  if (!isLoggedIn()) return <Navigate to="/login" replace />
+  if (!onboardingDone) return <Navigate to="/onboarding" replace />
+  return children
+}
+
+// Si ya completó el onboarding, no debe poder volver a verlo
+function OnboardingGuard({ children }) {
+  const { onboardingDone } = useStore()
+  if (!isLoggedIn()) return <Navigate to="/login" replace />
+  if (onboardingDone) return <Navigate to="/" replace />
+  return children
+}
+
 function AuthRedirect() {
   const [params] = useSearchParams()
   const token = params.get('token')
@@ -23,18 +39,17 @@ function AuthRedirect() {
 }
 
 export default function App() {
-  const { onboardingDone } = useStore()
   return (
     <Routes>
       <Route path="/login"      element={<Login />} />
       <Route path="/auth"       element={<AuthRedirect />} />
-      <Route path="/onboarding" element={<Guard><Onboarding /></Guard>} />
+      <Route path="/onboarding" element={<OnboardingGuard><Onboarding /></OnboardingGuard>} />
       <Route path="/" element={<Guard><Layout /></Guard>}>
-        <Route index            element={onboardingDone ? <Home /> : <Navigate to="/onboarding" replace />} />
-        <Route path="gym"       element={<Gym />} />
-        <Route path="nutricion" element={<Nutricion />} />
-        <Route path="progreso"  element={<Progreso />} />
-        <Route path="perfil"    element={<Perfil />} />
+        <Route index            element={<RequireOnboarding><Home /></RequireOnboarding>} />
+        <Route path="gym"       element={<RequireOnboarding><Gym /></RequireOnboarding>} />
+        <Route path="nutricion" element={<RequireOnboarding><Nutricion /></RequireOnboarding>} />
+        <Route path="progreso"  element={<RequireOnboarding><Progreso /></RequireOnboarding>} />
+        <Route path="perfil"    element={<RequireOnboarding><Perfil /></RequireOnboarding>} />
       </Route>
     </Routes>
   )
