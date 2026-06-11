@@ -35,6 +35,7 @@ export const api = {
   getHoy:            ()      => req('GET',  '/api/hoy'),
   getMacros:         ()      => req('GET',  '/api/macros/hoy'),
   getNutricion:      ()      => req('GET',  '/api/nutricion'),
+  generarNutricion:  ()      => req('POST', '/api/nutricion/generar'),
   getPesajes:        (n=30)  => req('GET',  `/api/pesajes?n=${n}`),
   getActividad:      ()      => req('GET',  '/api/actividad'),
   getAnalisis:       ()      => req('GET',  '/api/analisis'),
