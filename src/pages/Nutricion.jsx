@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 
@@ -5,8 +6,16 @@ const DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Doming
 
 export default function Nutricion() {
   const { data: macros } = useQuery({ queryKey:['macros'],    queryFn: api.getMacros })
-  const { data: plan }   = useQuery({ queryKey:['nutricion'], queryFn: api.getNutricion })
+  const { data: plan, refetch }   = useQuery({ queryKey:['nutricion'], queryFn: api.getNutricion })
   const diaIdx = new Date().getDay()===0 ? 6 : new Date().getDay()-1
+  const [generando, setGenerando] = useState(false)
+
+  async function handleGenerar() {
+    setGenerando(true)
+    try { await api.generarNutricion(); await refetch() }
+    catch (e) { alert('Error generando el plan. Intenta de nuevo.') }
+    finally { setGenerando(false) }
+  }
 
   return (
     <div className="page">
@@ -109,7 +118,10 @@ export default function Nutricion() {
           <div className="card p-8 text-center">
             <p className="text-3xl mb-3">🥗</p>
             <p className="text-white font-semibold">Plan en camino</p>
-            <p className="text-[#444] text-sm mt-1">Gemini genera el plan cada domingo con tus datos reales</p>
+            <p className="text-[#444] text-sm mt-1 mb-4">Gemini genera el plan cada domingo con tus datos reales</p>
+            <button onClick={handleGenerar} disabled={generando} className="btn-primary">
+              {generando ? 'Generando... (puede tardar 30s)' : '✨ Generar ahora'}
+            </button>
           </div>
         )}
       </div>
