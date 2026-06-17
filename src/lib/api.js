@@ -42,5 +42,6 @@ export const api = {
   getProgreso:       ()      => req('GET',  '/api/progreso'),
   getResumenSemanal: ()      => req('GET',  '/api/resumen/semanal'),
   getGoogleFitUrl:   ()      => req('GET',  '/api/google-fit/auth-url'),
+  checkGoogleFit:    ()      => req('GET',  '/api/google-fit/status'),
   askCoach:          (q)     => req('POST', '/api/coach/ask', { pregunta: q }),
 }
