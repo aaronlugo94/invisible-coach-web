@@ -118,12 +118,19 @@ export default function Nutricion() {
           <div className="card p-8 text-center">
             <p className="text-3xl mb-3">🥗</p>
             <p className="text-white font-semibold">Plan en camino</p>
-            <p className="text-[#444] text-sm mt-1 mb-4">Gemini genera el plan cada domingo con tus datos reales</p>
+            <p className="text-[#444] text-sm mt-1 mb-4">Toca el botón para generar tu plan semanal con IA</p>
             <button onClick={handleGenerar} disabled={generando} className="btn-primary">
-              {generando ? 'Generando... (puede tardar 30s)' : '✨ Generar ahora'}
+              {generando ? 'Generando... (puede tardar 30s)' : '✨ Generar plan'}
             </button>
           </div>
         )}
+        {/* Botón de regenerar siempre visible al final */}
+        <div className="card p-4 text-center">
+          <button onClick={handleGenerar} disabled={generando} className="btn-secondary w-full">
+            {generando ? 'Generando...' : '🔄 Regenerar plan semanal'}
+          </button>
+          <p className="text-[#333] text-xs mt-2">Usa tus macros y preferencias actuales</p>
+        </div>
       </div>
     </div>
   )
